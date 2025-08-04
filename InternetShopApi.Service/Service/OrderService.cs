@@ -10,11 +10,11 @@ namespace InternetShopApi.Service.Service
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        public OrderService(IOrderRepository orderRepository) => _orderRepository = orderRepository;    
+        public OrderService(IOrderRepository orderRepository) => _orderRepository = orderRepository;
 
         public async Task<IEnumerable<OrderResultDto>> GetAllOrderAsync()
         {
-            var order =  await _orderRepository.GetAllAsync();
+            var order = await _orderRepository.GetAllAsync();
 
             var result = order.Select(order => new OrderResultDto
             {
@@ -37,8 +37,7 @@ namespace InternetShopApi.Service.Service
         public async Task<OrderResultDto?> GetByIdAsync(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
-            if (order == null)
-                throw new ArgumentNullException(nameof(order));
+            Guard.AgainsNull(order, nameof(order));
             return new OrderResultDto
             {
                 OrderId = order.OrderId,
@@ -55,8 +54,7 @@ namespace InternetShopApi.Service.Service
         }
         public async Task<OrderResultDto> CreateOrderAsync(OrderCreateDto dto)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto));
+            Guard.AgainsNull(dto, nameof(dto));
 
             var order = new Order
             {
@@ -68,7 +66,7 @@ namespace InternetShopApi.Service.Service
                     Quantity = i.Quantity
                 }).ToList()
             };
-            
+
             var orderCreate = await _orderRepository.CreateAsync(order);
 
             return new OrderResultDto
@@ -87,18 +85,17 @@ namespace InternetShopApi.Service.Service
         public async Task<bool> DeleteOrderAsync(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
-            if(order == null) 
-                throw new ArgumentNullException(nameof(order));
+
+            Guard.AgainsNull(order, nameof(order));
 
             return await _orderRepository.DeleteAsync(id);
         }
 
         public async Task<bool> UpdateOrderAsync(Order order)
         {
-            if(order == null)
-                throw new ArgumentNullException(nameof(order));
+            Guard.AgainsNull(order, nameof(order));
 
-            var existingOrder =  _orderRepository.UpdateAsync(order);
+            var existingOrder = _orderRepository.UpdateAsync(order);
             if (existingOrder == null)
                 throw new ArgumentException("Order not found");
 

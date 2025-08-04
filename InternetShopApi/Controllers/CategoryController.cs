@@ -1,4 +1,5 @@
-﻿using InternetShopApi.Domain.Entities;
+﻿using InternetShopApi.Contracts.Dtos.CategoryDto;
+using InternetShopApi.Domain.Entities;
 using InternetShopApi.Service.Service;
 using InternetShopApi.Service.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -35,11 +36,11 @@ namespace InternetShopApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> CreateAsync(Category category)
+        public async Task<ActionResult<Category>> CreateAsync(CategoryCreateDto dto)
         {
             try
             {
-                var createCategory = await _categoryService.CreateCategoryAsync(category);
+                var createCategory = await _categoryService.CreateCategoryAsync(dto);
                 return CreatedAtRoute(
                     "GetCategoryById",
                     new { id = createCategory.CategoryId },

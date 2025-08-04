@@ -30,10 +30,9 @@ namespace InternetShopApi.Service.Service
         public async Task<ProductResultDto?> GetByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-            if (string.IsNullOrEmpty(product.Name))
-                throw new ArgumentException();
+            
+            Guard.AgainsNull(product, nameof(product));
+
             return new ProductResultDto
             {
                 ProductId = product.ProductId,
@@ -45,10 +44,8 @@ namespace InternetShopApi.Service.Service
         }
         public async Task<ProductResultDto> CreateProductAsync(ProductCreateDto dto)
         {
-            if (dto == null)
-                throw new ArgumentNullException(nameof(dto));
-            if(string.IsNullOrEmpty(dto.Name))
-                throw new ArgumentException("Product name can't be empty");
+            Guard.AgainsNull(dto, nameof(dto));
+            Guard.AgainstEmpty(dto.Name, nameof(dto.Name));
 
 
             var product = new Product
@@ -71,18 +68,15 @@ namespace InternetShopApi.Service.Service
         public async Task<bool> DeleteProductAsync(int id)
         {
             var deleteProduct = await _productRepository.GetByIdAsync(id);
-            if(deleteProduct == null)
-                throw new ArgumentNullException(nameof(deleteProduct));
+            Guard.AgainsNull(deleteProduct, nameof(deleteProduct));
 
             return await _productRepository.DeleteAsync(id);
         }
 
         public async Task<bool> UpdateProductAsync(Product product)
         {
-            if(product == null)
-                throw new ArgumentNullException(nameof(product));
-            if(string.IsNullOrEmpty(product.Name))
-                throw new ArgumentException("Product name can't be empty");
+            Guard.AgainsNull(product, nameof(product));
+            Guard.AgainstEmpty(product.Name, nameof(product.Name));
 
             return await _productRepository.UpdateAsync(product);
         }
