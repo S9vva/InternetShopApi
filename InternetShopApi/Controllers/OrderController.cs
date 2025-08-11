@@ -2,12 +2,14 @@
 using InternetShopApi.Domain.Entities;
 using InternetShopApi.Dtos.OrderDto;
 using InternetShopApi.Service.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InternetShopApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         public readonly IOrderService _orderService;
@@ -55,17 +57,15 @@ namespace InternetShopApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, Order order)
+        public async Task<IActionResult> UpdateAsync(int id, OrderItemCreateDto dto)
         {
-            if (id != order.OrderId)
-            {
-                return BadRequest("ID mismatch");
-            }
 
             try
             {
-                var result = await _orderService.UpdateOrderAsync(order);
-                return result ? NoContent() : NotFound();
+                var result = await _orderService.UpdateOrderAsync(id, dto);
+                if(result == null)
+                    return NotFound($"Order with Id {id} not found.");
+                return Ok(result);
             }
             catch (ArgumentException ex)
             {

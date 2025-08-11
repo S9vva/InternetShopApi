@@ -19,6 +19,7 @@ namespace InternetShopApi.Service.Service
             var result = customer.Select(customer => new CustomerResultDto
             {
                 CustomerId = customer.CustomerId,
+                UserName = customer.UserName,
                 Name = customer.Name,
                 SurName = customer.SurName,
                 Email = customer.Email
@@ -28,7 +29,7 @@ namespace InternetShopApi.Service.Service
             return result;
         }
 
-        public async Task<CustomerResultDto?> GetByIdAsync(int id)
+        public async Task<CustomerResultDto?> GetByIdAsync(string id)
         {
             var customer = await _customerRepository.GetByIdAsync(id);
 
@@ -37,29 +38,24 @@ namespace InternetShopApi.Service.Service
             return new CustomerResultDto
             {
                 CustomerId = customer.CustomerId,
+                UserName = customer.UserName,
                 Name = customer.Name,
                 SurName = customer.SurName,
                 Email = customer.Email
             };
         }
 
-        public async Task<CustomerResultDto?> CreateCustomerAsync(CustomerCreateDto dto)
+        public async Task<CustomerResultDto?> CreateCustomerAsync(Customer customer)
         {
-            Guard.AgainsNull(dto, nameof(dto));
-            Guard.AgainstEmpty(dto.Name, nameof(dto.Name));
-
-            var customer = new Customer
-            {
-                Name = dto.Name,
-                SurName = dto.SurName,
-                Email = dto.Email
-            };
+            Guard.AgainsNull(customer, nameof(customer));
+            Guard.AgainstEmpty(customer.Name, nameof(customer.Name));
 
             var customerCreate = await _customerRepository.CreateAsync(customer);
 
             return new CustomerResultDto
             {
                 CustomerId = customer.CustomerId,
+                UserName = customer.UserName,
                 Name = customer.Name,
                 SurName = customer.SurName,
                 Email = customer.Email
@@ -68,7 +64,7 @@ namespace InternetShopApi.Service.Service
 
         }
 
-        public async Task<bool> DeleteCustomerAsync(int id)
+        public async Task<bool> DeleteCustomerAsync(string id)
         {
             var customer = _customerRepository.GetByIdAsync(id);
             Guard.AgainsNull(customer, nameof(customer));
@@ -76,16 +72,25 @@ namespace InternetShopApi.Service.Service
             return await _customerRepository.DeleteAsync(id);
         }
 
-        public async Task<bool> UpdateCustomerAsync(Customer customer)
+        public async Task<CustomerResultDto> UpdateCustomerAsync(string id, CustomerUpdateDto dto)
         {
-            Guard.AgainsNull(customer, nameof(customer));
-            Guard.AgainstEmpty(customer.Name, nameof(customer.Name));
+            Guard.AgainsNull(dto, nameof(dto));
+            Guard.AgainstEmpty(dto.Name, nameof(dto.Name));
 
-            var existingCustomer = _customerRepository.UpdateAsync(customer);
+            var existingCustomer = await _customerRepository.GetByIdAsync(id);
             if (existingCustomer == null)
-                throw new ArgumentException("Customer not found");
+                throw new ArgumentException($"Customer with Id {id} not found");
+            existingCustomer.Name = dto.Name;
 
-            return await existingCustomer;
+            await _customerRepository.UpdateAsync(existingCustomer);
+
+            return new CustomerResultDto
+            {
+                CustomerId = existingCustomer.CustomerId,
+                Name = existingCustomer.Name,
+                SurName = existingCustomer.SurName,
+                Email = existingCustomer.Email
+            };
         }
     }
 }

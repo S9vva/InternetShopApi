@@ -6,7 +6,7 @@ namespace InternetShopApi.Dtos.OrderDto
     {
         public int OrderId { get; set; }
         public DateTime DateTime { get; set; }
-        public int CustomerId { get; set; }
+        public string CustomerId { get; set; }
         public List<OrderItemResultDto> Items { get; set; }
     }
 }

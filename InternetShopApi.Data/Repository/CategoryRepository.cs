@@ -12,10 +12,7 @@ namespace InternetShopApi.Data.Repository
         public CategoryRepository(InternetShopDbContext context) => _context = context;
 
         public async Task<IEnumerable<Category>> GetAllAsync() =>
-            await _context.Categories
-            .Include(c => c.CategoryId)
-            .Include(c => c.Name)
-                .ToListAsync();
+            await _context.Categories.ToListAsync();
 
         public async Task<Category?> GetByIdAsync(int id) =>
             await _context.Categories.FindAsync(id);
@@ -31,7 +28,12 @@ namespace InternetShopApi.Data.Repository
         {
             var categories = await _context.Categories.FindAsync(id);
             if (categories == null) return false;
-
+            
+            var isUseInProduct = await _context.Products.AnyAsync(p => p.CategoryId == id);
+            if (isUseInProduct)
+            {
+                throw new InvalidOperationException("It is impossible to delete a product because it is used in products.");
+            }
             _context.Categories.Remove(categories);
             return await _context.SaveChangesAsync() > 0;
         }

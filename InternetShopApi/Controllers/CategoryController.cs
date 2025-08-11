@@ -1,13 +1,14 @@
 ﻿using InternetShopApi.Contracts.Dtos.CategoryDto;
 using InternetShopApi.Domain.Entities;
-using InternetShopApi.Service.Service;
 using InternetShopApi.Service.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InternetShopApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -46,24 +47,23 @@ namespace InternetShopApi.Controllers
                     new { id = createCategory.CategoryId },
                     createCategory);
             }
-            catch(ArgumentException ex) 
+            catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
 
-        public async Task<IActionResult> UpdateAsync(int id, Category category)
+        public async Task<IActionResult> UpdateAsync(int id, CategoryCreateDto categoryDto)
         {
-            if(id != category.CategoryId)
-            {
-                return BadRequest("ID mismatch");
-            }
             try
             {
-                var result = await _categoryService.UpdateCategory(category);
-                return result ? NoContent() : NotFound();
+                var result = await _categoryService.UpdateCategory(id, categoryDto);
+                if (result == null)
+                    return NotFound($"Category with Id {id} not found.");
+
+                return Ok(result);
             }
             catch (ArgumentException ex)
             {
@@ -72,6 +72,7 @@ namespace InternetShopApi.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             try
@@ -79,7 +80,11 @@ namespace InternetShopApi.Controllers
                 var result = await _categoryService.DeleteCategoryAsync(id);
                 return result ? NoContent() : NotFound();
             }
-            catch(ArgumentNullException)
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
+            catch (ArgumentNullException)
             {
                 return NotFound();
             }
@@ -87,5 +92,5 @@ namespace InternetShopApi.Controllers
 
 
     }
-    
+
 }

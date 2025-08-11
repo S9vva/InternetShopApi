@@ -1,12 +1,14 @@
 ﻿using InternetShopApi.Contracts.Dtos.CustomerDto;
 using InternetShopApi.Domain.Entities;
 using InternetShopApi.Service.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InternetShopApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -21,7 +23,7 @@ namespace InternetShopApi.Controllers
         }
 
         [HttpGet("{id}",Name = "GetCustomerById")]
-        public async Task<ActionResult<Customer>> GetByIdAsync (int id)
+        public async Task<ActionResult<Customer>> GetByIdAsync (string id)
         {
             try
             {
@@ -34,34 +36,16 @@ namespace InternetShopApi.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Customer>> CreateAsync (CustomerCreateDto dto)
-        {
-            try
-            {
-                var created = await _customerService.CreateCustomerAsync(dto);
-                return CreatedAtRoute(
-                    "GetCustomerById",
-                    new { id = created.CustomerId },
-                    created);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-        }
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, Customer customer)
+        public async Task<IActionResult> UpdateAsync(string id, CustomerUpdateDto dto)
         {
-            if (id != customer.CustomerId)
-                return BadRequest("ID mismatch");
 
             try
             {
-                var result = await _customerService.UpdateCustomerAsync(customer);
-                return result ? NoContent() : NotFound();
+                var result = await _customerService.UpdateCustomerAsync(id, dto);
+                if (result == null)
+                    return NotFound($"Customer with Id {id} not found.");
+                return Ok(result);
             }
             catch(ArgumentException ex)
             {
@@ -70,7 +54,7 @@ namespace InternetShopApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(string id)
         {
             try
             {

@@ -5,9 +5,9 @@ namespace InternetShopApi.Data.Repository.Interfaces
     public interface ICustomerRepository
     {
         Task<IEnumerable<Customer>> GetAllAsync();
-        Task<Customer?> GetByIdAsync (int id);
+        Task<Customer?> GetByIdAsync (string id);
         Task<Customer?> CreateAsync(Customer customer);
         Task<bool> UpdateAsync(Customer customer);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(string id);
     }
 }

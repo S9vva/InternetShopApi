@@ -11,9 +11,9 @@ namespace InternetShopApi.Service.Service.Interfaces
     public interface ICustomerService
     {
         Task<IEnumerable<CustomerResultDto>> GetAllCusmoresAsync();
-        Task<CustomerResultDto?> GetByIdAsync(int id);
-        Task<CustomerResultDto?> CreateCustomerAsync(CustomerCreateDto dto);
-        Task<bool> UpdateCustomerAsync(Customer customer);
-        Task<bool> DeleteCustomerAsync(int id);
+        Task<CustomerResultDto?> GetByIdAsync(string id);
+        Task<CustomerResultDto?> CreateCustomerAsync(Customer customer);
+        Task<CustomerResultDto> UpdateCustomerAsync(string id, CustomerUpdateDto dto);
+        Task<bool> DeleteCustomerAsync(string id);
     }
 }

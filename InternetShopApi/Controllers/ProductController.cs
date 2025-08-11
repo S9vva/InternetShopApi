@@ -1,13 +1,16 @@
 ﻿
 using InternetShopApi.Contracts.Dtos.ProductDto;
 using InternetShopApi.Domain.Entities;
+using InternetShopApi.Service;
 using InternetShopApi.Service.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InternetShopApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -26,7 +29,7 @@ namespace InternetShopApi.Controllers
         {
             try
             {
-                var order = _productService.GetByIdAsync(id);
+                var order = await _productService.GetByIdAsync(id);
                 return Ok(order);
             }
             catch (ArgumentNullException)
@@ -71,12 +74,17 @@ namespace InternetShopApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             try
             {
                 var result = await _productService.DeleteProductAsync(id);
-                return result ? NoContent() : NotFound();
+                return Ok($"Product with Id {id} deleted");
+            }
+            catch(InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
             }
             catch (ArgumentNullException)
             {

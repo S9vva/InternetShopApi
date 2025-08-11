@@ -13,13 +13,17 @@ namespace InternetShopApi.Data.Repository
 
         public async Task<IEnumerable<Order>> GetAllAsync() =>
             await _context.Orders
-            .Include(o => o.Customer)
             .Include(o => o.Items)
-                .ThenInclude(i => i.Product)
+            .ThenInclude(i => i.Product)
             .ToListAsync();
 
         public async Task<Order?> GetByIdAsync(int id) =>
-            await _context.Orders.FindAsync(id);
+            await _context.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Product)
+            .FirstOrDefaultAsync();
+        public async Task<OrderItem?> GetByIdItemAsync(int id) =>
+            await _context.Items.FindAsync(id);
         public async Task<Order> CreateAsync(Order order)
         {
             var orders = await _context.Orders.AddAsync(order);
@@ -36,9 +40,9 @@ namespace InternetShopApi.Data.Repository
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateAsync(Order order)
+        public async Task<bool> UpdateAsync(OrderItem order)
         {
-            _context.Orders.Update(order);
+            _context.Items.Update(order);
             return await _context.SaveChangesAsync() > 0;
         }
     }

@@ -13,7 +13,7 @@ namespace InternetShopApi.Domain.Entities
         public DateTime OrderDate { get; set; }
 
         [Required]
-        public int CustomerId {  get; set; }
+        public string CustomerId {  get; set; }
 
         [Required]
         public Customer Customer { get; set; }

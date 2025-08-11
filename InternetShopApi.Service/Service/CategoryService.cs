@@ -43,7 +43,6 @@ namespace InternetShopApi.Service.Service
         public async Task<CategoryResultDto> CreateCategoryAsync(CategoryCreateDto dto)
         {
             Guard.AgainsNull(dto, nameof(dto));
-
             Guard.AgainstEmpty(dto.Name, nameof(dto.Name));
 
             var category = new Category
@@ -66,21 +65,29 @@ namespace InternetShopApi.Service.Service
 
             Guard.AgainsNull(category, nameof(category));
 
+
             return await _categoryRepository.DeleteAsync(id);
 
         }
 
 
-        public async Task<bool> UpdateCategory(Category category)
+        public async Task<CategoryResultDto> UpdateCategory(int id, CategoryCreateDto dto)
         {
-            Guard.AgainsNull(category, nameof(category));
-            Guard.AgainstEmpty(category.Name, nameof(category.Name));
+            Guard.AgainsNull(dto, nameof(dto));
+            Guard.AgainstEmpty(dto.Name, nameof(dto.Name));
 
-            var existingCategory = await _categoryRepository.UpdateAsync(category);
-            if (existingCategory == null)
-                throw new ArgumentException("Category not found");
+            var existing = await _categoryRepository.GetByIdAsync(id);
+            Guard.AgainsNull(existing, nameof(existing));
 
-            return existingCategory;
+            existing.Name = dto.Name;
+
+            await _categoryRepository.UpdateAsync(existing);
+
+            return new CategoryResultDto
+            {
+                CategoryId = existing.CategoryId,
+                Name = existing.Name
+            };
         }
     }
 }

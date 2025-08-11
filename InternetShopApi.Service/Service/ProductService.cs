@@ -1,4 +1,4 @@
-﻿using Humanizer;
+﻿
 using InternetShopApi.Contracts.Dtos.ProductDto;
 using InternetShopApi.Data.Repository.Interfaces;
 using InternetShopApi.Domain.Entities;
@@ -59,9 +59,10 @@ namespace InternetShopApi.Service.Service
 
             return new ProductResultDto
             {
+                ProductId = productCreate.ProductId,
                 Name = productCreate.Name,
                 Price = productCreate.Price,
-                CategoryId = productCreate.CategoryId
+                CategoryId = productCreate.CategoryId,
             };
         }
 

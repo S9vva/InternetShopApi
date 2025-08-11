@@ -91,15 +91,25 @@ namespace InternetShopApi.Service.Service
             return await _orderRepository.DeleteAsync(id);
         }
 
-        public async Task<bool> UpdateOrderAsync(Order order)
+        public async Task<OrderItemResultDto> UpdateOrderAsync(int id, OrderItemCreateDto dto)
         {
-            Guard.AgainsNull(order, nameof(order));
+            Guard.AgainsNull(dto, nameof(dto));
 
-            var existingOrder = _orderRepository.UpdateAsync(order);
+           var existingOrder = await _orderRepository.GetByIdItemAsync(id);
             if (existingOrder == null)
-                throw new ArgumentException("Order not found");
+                throw new ArgumentException($"Order with Id {id} not found");
+           
+           existingOrder.Quantity = dto.Quantity;
 
-            return await existingOrder;
+            await _orderRepository.UpdateAsync(existingOrder);
+
+            return new OrderItemResultDto
+            {
+                Quantity = dto.Quantity,
+                ProductId = dto.ProductId,
+            };
+
+            
         }
     }
 }

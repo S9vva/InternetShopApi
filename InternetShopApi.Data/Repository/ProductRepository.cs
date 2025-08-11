@@ -18,7 +18,9 @@ namespace InternetShopApi.Data.Repository
 
 
         public async Task<Product?> GetByIdAsync(int id) =>
-            await _context.Products.FindAsync(id);
+            await _context.Products
+            .Include(p => p.Category)
+            .FirstOrDefaultAsync(p => p.ProductId == id);
 
         public async Task<Product> CreateAsync(Product product)
         {
@@ -37,6 +39,10 @@ namespace InternetShopApi.Data.Repository
         {
             var product = await _context.Products.FindAsync(id);
             if(product == null) return false;
+
+            var isUseInOrder = await _context.Items.AnyAsync(o => o.ProductId == id);
+            if (isUseInOrder)
+                throw new InvalidOperationException("It is impossible to delete a product because it is used in orders.");
 
             _context.Products.Remove(product);
             return await _context.SaveChangesAsync() > 0;

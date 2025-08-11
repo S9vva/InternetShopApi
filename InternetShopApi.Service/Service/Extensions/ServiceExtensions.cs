@@ -1,4 +1,5 @@
-﻿using InternetShopApi.Service.Service.Interfaces;
+﻿using InternetShopApi.Service.Service.Auth.Interface;
+using InternetShopApi.Service.Service.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace InternetShopApi.Service.Service.Extensions
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

@@ -8,7 +8,7 @@ namespace InternetShopApi.Service.Service.Interfaces
         Task<IEnumerable<CategoryResultDto>> GetAllCategoriesAsync();
         Task<CategoryResultDto> GetByIdAsync(int id);
         Task<CategoryResultDto> CreateCategoryAsync(CategoryCreateDto dto);
-        Task<bool> UpdateCategory(Category category);
+        Task<CategoryResultDto> UpdateCategory(int id, CategoryCreateDto dto);
         Task<bool> DeleteCategoryAsync(int id);
     }
 }

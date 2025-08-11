@@ -12,16 +12,11 @@ namespace InternetShopApi.Data.Repository
 
         public CustomerRepository(InternetShopDbContext context) => _context = context;
 
-        public async Task<Customer?> GetByIdAsync(int id) =>
+        public async Task<Customer?> GetByIdAsync(string id) =>
             await _context.Customers.FindAsync(id);
 
         public async Task<IEnumerable<Customer>> GetAllAsync() =>
-            await _context.Customers
-            .Include(c => c.CustomerId)
-            .Include(c => c.Name)
-            .Include(c => c.SurName)
-            .Include(c => c.Email)
-                .ToListAsync();
+            await _context.Customers.ToListAsync();
 
         public async Task<Customer?> CreateAsync(Customer customer)
         {
@@ -30,7 +25,7 @@ namespace InternetShopApi.Data.Repository
             return customer;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(string id)
         {
             var customers = await _context.Customers.FindAsync(id);
             if (customers == null) return false;
